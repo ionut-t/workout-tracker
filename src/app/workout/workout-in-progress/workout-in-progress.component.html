@@ -3,11 +3,9 @@
   fxLayout="column"
   fxLayoutAlign="center center"
 >
-  <mat-progress-spinner
-    mode="determinate"
-    [value]="progress"
-    color="accent"
-  ></mat-progress-spinner>
+  <mat-progress-spinner mode="determinate" [value]="progress" color="accent">
+  </mat-progress-spinner>
+  <h1>{{ progress }}%</h1>
   <h3>Keep going! Don't give up!</h3>
   <button mat-raised-button color="warn" (click)="onStop()">Stop</button>
 </section>
