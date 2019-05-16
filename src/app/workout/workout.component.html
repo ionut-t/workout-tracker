@@ -1,3 +1,16 @@
-<p>
-  workout works!
-</p>
+<mat-tab-group
+  mat-align-tabs="center"
+  color="primary"
+  backgroundColor="primary"
+>
+  <mat-tab label="New Workout">
+    <ng-template matTabContent>
+      <app-new-workout></app-new-workout>
+    </ng-template>
+  </mat-tab>
+  <mat-tab label="Logs">
+    <ng-template matTabContent>
+      Workout arhive
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>
