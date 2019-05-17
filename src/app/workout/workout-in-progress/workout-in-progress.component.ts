@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { StopWorkoutComponent } from './stop-workout/stop-workout.component';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { WorkoutService } from '../workout.service';
 
 @Component({
   selector: 'app-workout-in-progress',
@@ -12,21 +13,28 @@ export class WorkoutInProgressComponent implements OnInit, OnDestroy {
   progress = 0;
   timer: any; // with type number VS Code will emit an error
   private dialogSubscription$: Subscription;
-  exitWorkout$ = new Subject<boolean>();
 
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private workoutService: WorkoutService
+  ) {}
 
   ngOnInit() {
-    this.onStartOrResumeTimer();
+    // Trigger the timer
+    this.startOrResumeTimer();
   }
 
-  onStartOrResumeTimer() {
+  startOrResumeTimer() {
+    const step =
+      (this.workoutService.getRunningWorkout().duration / 100) * 1000;
     this.timer = setInterval(() => {
       this.progress = this.progress + 1;
       if (this.progress >= 100) {
+        // Return to the main workout page and reset the timer
+        this.workoutService.completeWorkout();
         clearInterval(this.timer);
       }
-    }, 1000);
+    }, step);
   }
 
   onStop() {
@@ -41,14 +49,16 @@ export class WorkoutInProgressComponent implements OnInit, OnDestroy {
     // Close or resume the workout session
     this.dialogSubscription$ = dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.exitWorkout$.next();
+        this.workoutService.cancelWorkout(this.progress);
       } else {
-        this.onStartOrResumeTimer();
+        this.startOrResumeTimer();
       }
     });
   }
 
   ngOnDestroy() {
-    this.dialogSubscription$.unsubscribe();
+    if (this.dialogSubscription$) {
+      this.dialogSubscription$.unsubscribe();
+    }
   }
 }

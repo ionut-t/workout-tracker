@@ -9,13 +9,15 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
 import { WorkoutInProgressComponent } from './workout-in-progress/workout-in-progress.component';
 import { StopWorkoutComponent } from './workout-in-progress/stop-workout/stop-workout.component';
+import { WorkoutLogsComponent } from './workout-logs/workout-logs.component';
 
 @NgModule({
   declarations: [
     WorkoutComponent,
     NewWorkoutComponent,
     WorkoutInProgressComponent,
-    StopWorkoutComponent
+    StopWorkoutComponent,
+    WorkoutLogsComponent
   ],
   imports: [
     CommonModule,

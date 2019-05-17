@@ -16,7 +16,7 @@ export class WorkoutComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // It will fire if the user will start a workout session
-    this.workoutSubscription$ = this.workoutService.exerciseSelected$.subscribe(
+    this.workoutSubscription$ = this.workoutService.selectedExercise$.subscribe(
       (exercise: Exercise) => {
         if (exercise) {
           this.workoutInProgress = true;
@@ -28,6 +28,8 @@ export class WorkoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.workoutSubscription$.unsubscribe();
+    if (this.workoutSubscription$) {
+      this.workoutSubscription$.unsubscribe();
+    }
   }
 }
