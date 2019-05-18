@@ -1,3 +1,58 @@
-<p>
-  register works!
-</p>
+<section class="register">
+  <form
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="15px"
+    [formGroup]="registerForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <mat-form-field>
+      <input
+        matInput
+        type="email"
+        placeholder="Enter your email"
+        formControlName="email"
+      />
+      <mat-error *ngIf="f.email.invalid">{{ emailErrorHandler() }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field hintLabel="Password must contain minim 6 characters">
+      <input
+        matInput
+        [type]="hide ? 'password' : 'text'"
+        placeholder="Enter a password"
+        formControlName="password"
+      />
+      <mat-icon matSuffix (click)="hide = !hide">
+        {{ hide ? "visibility_off" : "visibility" }}
+      </mat-icon>
+      <mat-hint align="end">{{ f.password.value?.length || 0 }}/6</mat-hint>
+      <mat-error *ngIf="f.password.invalid">
+        {{ passwordErrorHandler() }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input
+        matInput
+        [type]="hide ? 'password' : 'text'"
+        placeholder="Confirm your password"
+        formControlName="confirmPassword"
+      />
+      <mat-icon matSuffix (click)="hide = !hide">
+        {{ hide ? "visibility_off" : "visibility" }}
+      </mat-icon>
+      <mat-error *ngIf="f.confirmPassword.invalid">
+        {{ confirmPasswordErrorHandler() }}
+      </mat-error>
+    </mat-form-field>
+    <button
+      mat-raised-button
+      type="submit"
+      color="primary"
+      [disabled]="registerForm.invalid"
+    >
+      Register
+    </button>
+  </form>
+</section>
