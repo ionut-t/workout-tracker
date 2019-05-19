@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Exercise } from './exercise.model';
 import { EXERCISES } from './mock-exercises';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +12,37 @@ export class WorkoutService {
   private listOfExercises: Exercise[] = [...EXERCISES];
   private runningWorkout: Exercise;
   selectedExercise$ = new Subject<Exercise>();
-  private exercises: Exercise[] = [];
+  exercisesChanged$ = new Subject<Exercise[]>();
+  finishedWorkoutChanged$ = new Subject<Exercise[]>();
+  private firebaseSubscriptions$: Subscription[] = [];
 
-  constructor() {}
+  constructor(private db: AngularFirestore) {}
 
-  getExercises(): Exercise[] {
-    // Return a copy of the mock-exercises array
-    return this.listOfExercises;
+  // Get the list of exercises from the firestore database
+  getListOfExercises() {
+    this.firebaseSubscriptions$.push(
+      this.db
+        .collection('listOfExercises')
+        .snapshotChanges()
+        .pipe(
+          map(docArray => {
+            return docArray.map(document => {
+              return {
+                id: document.payload.doc.id,
+                name: document.payload.doc.get('name'),
+                duration: document.payload.doc.get('duration'),
+                calories: document.payload.doc.get('calories')
+              };
+            });
+          })
+        )
+        .subscribe((exercises: Exercise[]) => {
+          // Store the fetched exercises
+          this.listOfExercises = exercises;
+          // Emit a new copy of the list of exercises
+          this.exercisesChanged$.next([...this.listOfExercises]);
+        })
+    );
   }
 
   startWorkout(selectedId: string) {
@@ -31,7 +57,7 @@ export class WorkoutService {
 
   // Store the results if workout is complete and reset the workout in progress
   completeWorkout() {
-    this.exercises.push({
+    this.addDataToDatabase({
       ...this.runningWorkout,
       date: new Date(),
       state: 'completed'
@@ -42,7 +68,7 @@ export class WorkoutService {
 
   // Store the results if workout is cancelled and reset the workout in progress
   cancelWorkout(progress: number) {
-    this.exercises.push({
+    this.addDataToDatabase({
       ...this.runningWorkout,
       duration: this.runningWorkout.duration * (progress / 100),
       calories: this.runningWorkout.calories * (progress / 100),
@@ -57,7 +83,29 @@ export class WorkoutService {
     return { ...this.runningWorkout };
   }
 
+  // Fetch completed or cancelled workout from the server
   getCompletedOrCancelledWorkout() {
-    return [...this.exercises];
+    this.firebaseSubscriptions$.push(
+      this.db
+        .collection('finishedWorkout')
+        .valueChanges()
+        .subscribe((exercises: Exercise[]) => {
+          /* Emit a new value whenever the user gets a new finished
+        workout session from the server */
+          this.finishedWorkoutChanged$.next(exercises);
+        })
+    );
+  }
+
+  // Cancel all firebase subscriptions
+  cancelSubscriptions$() {
+    this.firebaseSubscriptions$.forEach(subscription$ =>
+      subscription$.unsubscribe()
+    );
+  }
+
+  // Add completed or cancelled workout to the database
+  private addDataToDatabase(workout: Exercise) {
+    this.db.collection('finishedWorkout').add(workout);
   }
 }
