@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -39,10 +40,14 @@ export class LoginComponent implements OnInit {
   passwordErrorHandler() {
     if (this.f.password.hasError('required')) {
       return 'Password is not correct';
-    } else {
-      return null;
     }
+    return null;
   }
 
-  onSubmit() {}
+  onSubmit() {
+    this.authService.loginUser({
+      email: this.loginForm.value.email,
+      password: this.loginForm.value.password
+    });
+  }
 }

@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Exercise } from './exercise.model';
-import { EXERCISES } from './mock-exercises';
 import { Subject, Subscription } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkoutService {
-  private listOfExercises: Exercise[] = [...EXERCISES];
+  private listOfExercises: Exercise[] = [];
   private runningWorkout: Exercise;
   selectedExercise$ = new Subject<Exercise>();
   exercisesChanged$ = new Subject<Exercise[]>();
   finishedWorkoutChanged$ = new Subject<Exercise[]>();
   private firebaseSubscriptions$: Subscription[] = [];
 
-  constructor(private db: AngularFirestore) {}
+  constructor(private db: AngularFirestore, private afAuth: AngularFireAuth) {}
 
   // Get the list of exercises from the firestore database
   getListOfExercises() {
@@ -85,9 +85,10 @@ export class WorkoutService {
 
   // Fetch completed or cancelled workout from the server
   getCompletedOrCancelledWorkout() {
+    const userId = this.afAuth.auth.currentUser.uid;
     this.firebaseSubscriptions$.push(
       this.db
-        .collection('finishedWorkout')
+        .collection(`users/${userId}/finishedWorkout`)
         .valueChanges()
         .subscribe((exercises: Exercise[]) => {
           /* Emit a new value whenever the user gets a new finished
@@ -106,6 +107,7 @@ export class WorkoutService {
 
   // Add completed or cancelled workout to the database
   private addDataToDatabase(workout: Exercise) {
-    this.db.collection('finishedWorkout').add(workout);
+    const userId = this.afAuth.auth.currentUser.uid;
+    this.db.collection(`users/${userId}/finishedWorkout`).add(workout);
   }
 }
