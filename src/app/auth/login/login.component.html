@@ -1,3 +1,4 @@
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
 <section class="login">
   <form
     fxLayout="column"
@@ -32,8 +33,14 @@
         {{ passwordErrorHandler() }}
       </mat-error>
     </mat-form-field>
-    <button mat-raised-button color="primary" [disabled]="loginForm.invalid">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="loginForm.invalid"
+      *ngIf="!isLoading"
+    >
       Login
     </button>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </section>

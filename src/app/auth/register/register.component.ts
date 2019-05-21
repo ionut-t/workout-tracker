@@ -1,22 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MustMatch } from './must-match.validator';
 import { AuthService } from '../auth.service';
+import { UIService } from '../../shared/ui.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   // hide/show password
   hide = true;
 
   registerForm: FormGroup;
+  private loadingSubscription$: Subscription;
+  isLoading = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private uiService: UIService
+  ) {}
 
   ngOnInit() {
+    this.loadingSubscription$ = this.uiService.loadingStateChanged$.subscribe(
+      isLoading => (this.isLoading = isLoading)
+    );
     this.registerForm = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
@@ -64,10 +75,17 @@ export class RegisterComponent implements OnInit {
     return null;
   }
 
+  // Register the user
   onSubmit() {
     this.authService.registerUser({
       email: this.registerForm.value.email,
       password: this.registerForm.value.password
     });
+  }
+
+  ngOnDestroy() {
+    if (this.loadingSubscription$) {
+      this.loadingSubscription$.unsubscribe();
+    }
   }
 }

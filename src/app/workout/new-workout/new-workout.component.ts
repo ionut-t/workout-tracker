@@ -3,6 +3,7 @@ import { WorkoutService } from '../workout.service';
 import { Exercise } from '../exercise.model';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { UIService } from '../../shared/ui.service';
 
 @Component({
   selector: 'app-new-workout',
@@ -11,20 +12,28 @@ import { Subscription } from 'rxjs';
 })
 export class NewWorkoutComponent implements OnInit, OnDestroy {
   exercises: Exercise[] = [];
-  exerciseSubscription$: Subscription;
+  private exerciseSubscription$: Subscription;
+  private loadingSubscription$: Subscription;
+  isLoading = false;
 
-  constructor(private workoutService: WorkoutService) {}
+  constructor(
+    private workoutService: WorkoutService,
+    private uiService: UIService
+  ) {}
 
   ngOnInit() {
+    this.loadingSubscription$ = this.uiService.loadingStateChanged$.subscribe(
+      isLoading => (this.isLoading = isLoading)
+    );
     // Subscribe to the new subject
     this.exerciseSubscription$ = this.workoutService.exercisesChanged$.subscribe(
       exercises => (this.exercises = exercises)
     );
-    this.fetchedListOfExercises();
+    this.fetchtListOfExercises();
   }
 
   // Fetch the list of exercises and initialize it in OnInit life cycle hook
-  fetchedListOfExercises() {
+  fetchtListOfExercises() {
     this.workoutService.getListOfExercises();
   }
 
@@ -37,6 +46,10 @@ export class NewWorkoutComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.exerciseSubscription$) {
       this.exerciseSubscription$.unsubscribe();
+    }
+
+    if (this.loadingSubscription$) {
+      this.loadingSubscription$.unsubscribe();
     }
   }
 }

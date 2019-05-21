@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { WorkoutService } from '../workout/workout.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { User } from './user.model';
+import { UIService } from '../shared/ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,16 +14,16 @@ import { User } from './user.model';
 export class AuthService {
   private isAuthenticated = false;
   authChange$ = new Subject<boolean>();
-  // user: User;
 
   constructor(
     private afAuth: AngularFireAuth,
     private router: Router,
     private workoutService: WorkoutService,
-    private db: AngularFirestore
+    private db: AngularFirestore,
+    private uiService: UIService
   ) {}
 
-  // It is initialized in the app-component
+  // It is initialized in the root component
   initAuthListener() {
     this.afAuth.authState.subscribe(user => {
       if (user) {
@@ -44,6 +45,7 @@ export class AuthService {
 
   // Register the user based on the auth-data model
   registerUser(authData: AuthData) {
+    this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then(result => {
@@ -54,19 +56,26 @@ export class AuthService {
             userId: user.uid
           });
         }
-        console.log(result.user);
       })
-      .catch(error => console.log(error));
+      .then(result => this.uiService.loadingStateChanged$.next(false))
+      .catch(error => {
+        this.uiService.loadingStateChanged$.next(false);
+        this.firebaseErrorHandler(error);
+      });
 
     this.authChange$.next(true);
   }
 
   // Login the user based on the auth-data model
   loginUser(authData: AuthData) {
+    this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
       .signInWithEmailAndPassword(authData.email, authData.password)
-      .then(result => console.log(result))
-      .catch(error => console.log(error.message));
+      .then(result => this.uiService.loadingStateChanged$.next(false))
+      .catch(error => {
+        this.uiService.loadingStateChanged$.next(false);
+        this.firebaseErrorHandler(error);
+      });
   }
 
   // Logout the user
@@ -82,5 +91,10 @@ export class AuthService {
   // Create a user collection
   private addUserToDatabase(user: User) {
     this.db.collection('users').add(user);
+  }
+
+  // Handle errors catched by firebase
+  private firebaseErrorHandler(error: Error) {
+    this.uiService.showSnackBar(error.message, null, 5000, 'top');
   }
 }

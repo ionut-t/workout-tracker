@@ -1,3 +1,4 @@
+<mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
 <section class="register">
   <form
     fxLayout="column"
@@ -51,8 +52,10 @@
       type="submit"
       color="primary"
       [disabled]="registerForm.invalid"
+      *ngIf="!isLoading"
     >
       Register
     </button>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </section>

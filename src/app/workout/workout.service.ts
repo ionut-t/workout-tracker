@@ -4,6 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { UIService } from '../shared/ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +17,15 @@ export class WorkoutService {
   finishedWorkoutChanged$ = new Subject<Exercise[]>();
   private firebaseSubscriptions$: Subscription[] = [];
 
-  constructor(private db: AngularFirestore, private afAuth: AngularFireAuth) {}
+  constructor(
+    private db: AngularFirestore,
+    private afAuth: AngularFireAuth,
+    private uiService: UIService
+  ) {}
 
   // Get the list of exercises from the firestore database
   getListOfExercises() {
+    this.uiService.loadingStateChanged$.next(true);
     this.firebaseSubscriptions$.push(
       this.db
         .collection('listOfExercises')
@@ -36,12 +42,25 @@ export class WorkoutService {
             });
           })
         )
-        .subscribe((exercises: Exercise[]) => {
-          // Store the fetched exercises
-          this.listOfExercises = exercises;
-          // Emit a new copy of the list of exercises
-          this.exercisesChanged$.next([...this.listOfExercises]);
-        })
+        .subscribe(
+          (exercises: Exercise[]) => {
+            this.uiService.loadingStateChanged$.next(false);
+            // Store the fetched exercises
+            this.listOfExercises = exercises;
+            // Emit a new copy of the list of exercises
+            this.exercisesChanged$.next([...this.listOfExercises]);
+          },
+          error => {
+            this.uiService.loadingStateChanged$.next(false);
+            this.uiService.showSnackBar(
+              'Loading exercises failed. Please try again later.',
+              null,
+              5000,
+              'top'
+            );
+            this.exercisesChanged$.next(null);
+          }
+        )
     );
   }
 
