@@ -1,9 +1,17 @@
 .register {
   margin-top: 50px;
+
+  @media only screen and (max-height: 400px) {
+    margin-top: 10px;
+  }
 }
 
 mat-form-field {
   width: 400px;
+
+  @media only screen and (max-width: 600px) {
+    width: 300px;
+  }
 }
 
 .mat-icon {

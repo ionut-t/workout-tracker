@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Subscription } from 'rxjs';
 import { UIService } from 'src/app/shared/ui.service';
+import { MatDialog } from '@angular/material';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 @Component({
   selector: 'app-login',
@@ -16,11 +18,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   loadingSubscription$: Subscription;
   isLoading = false;
+  passwordReset: string;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private uiService: UIService
+    private uiService: UIService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -62,6 +66,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: this.loginForm.value.email,
       password: this.loginForm.value.password
     });
+  }
+
+  // Open the forgot password dialog
+  onForgotPassword() {
+    this.dialog.open(ResetPasswordComponent);
   }
 
   ngOnDestroy() {

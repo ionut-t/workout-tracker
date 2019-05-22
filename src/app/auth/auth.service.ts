@@ -27,18 +27,14 @@ export class AuthService {
   initAuthListener() {
     this.afAuth.authState.subscribe(user => {
       if (user) {
-        this.authChange$.next(true);
-        this.isAuthenticated = true;
-
-        // Redirect to the workout section
-        this.router.navigate(['/workout']);
+        if (user.emailVerified) {
+          this.authChange$.next(true);
+          this.isAuthenticated = true;
+        }
       } else {
         this.workoutService.cancelSubscriptions$();
         this.authChange$.next(false);
         this.isAuthenticated = false;
-
-        // Redirect to the home page
-        this.router.navigate(['']);
       }
     });
   }
@@ -48,6 +44,7 @@ export class AuthService {
     this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
       .createUserWithEmailAndPassword(authData.email, authData.password)
+      .then(result => this.sendVerificationEmail())
       .then(result => {
         const user = this.afAuth.auth.currentUser;
         if (user != null) {
@@ -63,14 +60,30 @@ export class AuthService {
         this.firebaseErrorHandler(error);
       });
 
-    this.authChange$.next(true);
+    this.authChange$.next(false);
+    // this.isAuthenticated = false;
   }
 
-  // Login the user based on the auth-data model
+  // Login the user based on the auth-data model and if his email has been verified
   loginUser(authData: AuthData) {
     this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
       .signInWithEmailAndPassword(authData.email, authData.password)
+      .then(result => {
+        if (!result.user.emailVerified) {
+          this.authChange$.next(false);
+          this.uiService.showSnackBar(
+            'Please validate your email address',
+            null,
+            5000,
+            'top'
+          );
+        } else {
+          this.uiService.showSnackBar('Login Successful', null, 3000, 'bottom');
+          this.authChange$.next(true);
+          this.router.navigate(['/workout']);
+        }
+      })
       .then(result => this.uiService.loadingStateChanged$.next(false))
       .catch(error => {
         this.uiService.loadingStateChanged$.next(false);
@@ -81,6 +94,8 @@ export class AuthService {
   // Logout the user
   logoutUser() {
     this.afAuth.auth.signOut();
+    this.router.navigate(['']);
+    this.uiService.showSnackBar('Logout Successful', null, 3000, 'bottom');
   }
 
   // Check if the user is authenticated
@@ -93,8 +108,31 @@ export class AuthService {
     this.db.collection('users').add(user);
   }
 
+  // Send verification email
+  private async sendVerificationEmail() {
+    await this.afAuth.auth.currentUser.sendEmailVerification();
+    this.uiService.showSnackBar(
+      'A verification email has been sent to you address. Validate you email before you login.',
+      null,
+      5000,
+      'top'
+    );
+    await this.router.navigate(['/login']);
+  }
+
+  // Send email for password reset
+  async sendPasswordResetEmail(resetPasswordEmail: string) {
+    await this.afAuth.auth.sendPasswordResetEmail(resetPasswordEmail);
+    this.uiService.showSnackBar(
+      'An email for resseting your password has been sent to your address. Check your inbox.',
+      null,
+      5000,
+      'top'
+    );
+  }
+
   // Handle errors catched by firebase
-  private firebaseErrorHandler(error: Error) {
+  firebaseErrorHandler(error: Error) {
     this.uiService.showSnackBar(error.message, null, 5000, 'top');
   }
 }

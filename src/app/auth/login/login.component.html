@@ -41,6 +41,14 @@
     >
       Login
     </button>
+    <button
+      mat-button
+      type="button"
+      (click)="onForgotPassword()"
+      *ngIf="!isLoading"
+    >
+      Forgot Password
+    </button>
     <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </section>
