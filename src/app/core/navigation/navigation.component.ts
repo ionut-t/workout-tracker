@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class NavigationComponent implements OnInit, OnDestroy {
   authSubscription$: Subscription;
+  isOpened = false;
   isAuth = false;
 
   isHandset$: Observable<boolean> = this.breakpointObserver

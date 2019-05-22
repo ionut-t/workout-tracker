@@ -6,10 +6,6 @@
   width: 200px;
 }
 
-.sidenav .mat-toolbar {
-  background: inherit;
-}
-
 .mat-toolbar.mat-primary {
   position: sticky;
   top: 0;
@@ -28,4 +24,18 @@
 
 .main-toolbar__list > .mat-list-item {
   color: #fff;
+}
+
+.logo {
+  height: 52px;
+
+  &__secondary {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &__image {
+    height: 100%;
+  }
 }

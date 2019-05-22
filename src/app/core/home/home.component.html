@@ -1,3 +1,23 @@
-<p>
-  home works!
-</p>
+<section class="home">
+  <div class="home__background"></div>
+  <div class="home__logo">
+    <img
+      class="home__logo--image"
+      src="../../../assets/img/logo.png"
+      alt="logo"
+    />
+  </div>
+  <div class="home__content" fxLayout="column" fxLayoutAlign="center center">
+    <p class="home__content--text">
+      Join us and track your workout progress with our app
+    </p>
+    <button
+      mat-raised-button
+      color="primary"
+      class="home__content--cta"
+      (click)="onJoin()"
+    >
+      Join
+    </button>
+  </div>
+</section>
