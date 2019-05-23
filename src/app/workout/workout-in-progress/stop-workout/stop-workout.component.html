@@ -1,12 +1,14 @@
-<h1 mat-dialog-title>Are you sure you want to quit?</h1>
-<mat-dialog-content>
-  <p>You already got {{ data.progress }}%</p>
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-raised-button color="warn" [mat-dialog-close]="true">
-    Yes, I'm lazy
-  </button>
-  <button mat-raised-button color="accent" [mat-dialog-close]="false">
-    No, let's continue
-  </button>
-</mat-dialog-actions>
+<section fxLayout="column" fxLayoutAlign="center center">
+  <h1 mat-dialog-title>Are you sure you want to quit?</h1>
+  <mat-dialog-content>
+    <p>You already got {{ data.progress }}%</p>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button color="warn" [mat-dialog-close]="true">
+      Yes, I'm lazy
+    </button>
+    <button mat-raised-button color="accent" [mat-dialog-close]="false">
+      No, let's continue
+    </button>
+  </mat-dialog-actions>
+</section>
