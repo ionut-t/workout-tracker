@@ -30,6 +30,7 @@ export class AuthService {
         if (user.emailVerified) {
           this.authChange$.next(true);
           this.isAuthenticated = true;
+          this.router.navigate(['/workout']);
         }
       } else {
         this.workoutService.cancelSubscriptions$();
@@ -61,7 +62,6 @@ export class AuthService {
       });
 
     this.authChange$.next(false);
-    // this.isAuthenticated = false;
   }
 
   // Login the user based on the auth-data model and if his email has been verified
