@@ -1,0 +1,15 @@
+.heading {
+  font-size: 450%;
+}
+
+.page-not-found {
+  position: relative;
+  height: calc(100% - 140px);
+}
+
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
