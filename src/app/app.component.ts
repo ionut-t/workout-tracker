@@ -10,6 +10,10 @@ export class AppComponent implements OnInit {
   title = 'Workout Tracker';
 
   constructor(private authService: AuthService) {}
+
+  /**
+   * Initialize authentication listener
+   */
   ngOnInit() {
     this.authService.initAuthListener();
   }

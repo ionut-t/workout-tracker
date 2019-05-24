@@ -6,12 +6,16 @@ import { MatSnackBar, MatSnackBarVerticalPosition } from '@angular/material';
   providedIn: 'root'
 })
 export class UIService {
-  // Emit an event when the loading state has changed
+  /**
+   * Event listener who wraps a boolean to indicate wheter the loading started or finished
+   */
   loadingStateChanged$ = new Subject<boolean>();
 
   constructor(private snackBar: MatSnackBar) {}
 
-  // Display errors catched by firebase
+  /**
+   * Display a snack bar
+   */
   showSnackBar(
     message: string,
     action: any,

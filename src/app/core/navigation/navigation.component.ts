@@ -4,6 +4,9 @@ import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/auth.service';
 
+/**
+ * Navigation component
+ */
 @Component({
   selector: 'app-navigation',
   templateUrl: './navigation.component.html',
@@ -14,6 +17,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isOpened = false;
   isAuth = false;
 
+  /**
+   * Angular Material observable
+   */
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
@@ -23,6 +29,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
+  /**
+   * Check if user is authenticated
+   */
   ngOnInit() {
     this.authSubscription$ = this.authService.authChange$.subscribe(
       authStatus => {
@@ -31,10 +40,16 @@ export class NavigationComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Logout user
+   */
   onLogout() {
     this.authService.logoutUser();
   }
 
+  /**
+   * Unsubscribe from authentication subscription to prevent memory leaks
+   */
   ngOnDestroy() {
     if (this.authSubscription$) {
       this.authSubscription$.unsubscribe();

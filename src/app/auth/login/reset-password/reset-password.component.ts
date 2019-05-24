@@ -2,6 +2,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 import { AuthService } from '../../auth.service';
 
+/**
+ * Component invoked programmatically for password reset dialog
+ */
 @Component({
   selector: 'app-reset-password',
   templateUrl: './reset-password.component.html',
@@ -13,9 +16,15 @@ export class ResetPasswordComponent implements OnInit {
     private authService: AuthService
   ) {}
 
+  /**
+   * @ignore
+   */
   ngOnInit() {}
 
-  // Send reset password email and display firebase errors
+  /**
+   * Send reset password email
+   * Display firebase errors if any
+   */
   onResetPassword(email: string) {
     this.authService.sendPasswordResetEmail(email).catch(error => {
       this.authService.firebaseErrorHandler(error);

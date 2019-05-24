@@ -3,6 +3,9 @@ import { Subscription } from 'rxjs';
 import { WorkoutService } from './workout.service';
 import { Exercise } from './exercise.model';
 
+/**
+ * Main component for the workout section
+ */
 @Component({
   selector: 'app-workout',
   templateUrl: './workout.component.html',
@@ -15,7 +18,9 @@ export class WorkoutComponent implements OnInit, OnDestroy {
   constructor(private workoutService: WorkoutService) {}
 
   ngOnInit() {
-    // It will fire if the user will start a workout session
+    /**
+     * It will fire if the user will start a workout session
+     */
     this.workoutSubscription$ = this.workoutService.selectedExercise$.subscribe(
       (exercise: Exercise) => {
         if (exercise) {
@@ -27,6 +32,9 @@ export class WorkoutComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Unsubscribe from the workout subscription
+   */
   ngOnDestroy() {
     if (this.workoutSubscription$) {
       this.workoutSubscription$.unsubscribe();

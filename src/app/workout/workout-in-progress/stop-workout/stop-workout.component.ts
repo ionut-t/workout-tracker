@@ -1,6 +1,9 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
 
+/**
+ * Component invoked programmatically for stop/resume workout dialog
+ */
 @Component({
   selector: 'app-stop-workout',
   templateUrl: './stop-workout.component.html',
