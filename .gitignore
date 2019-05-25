@@ -3,6 +3,9 @@
 # credentials
 credentials.ts
 
+# documentation
+/documentation
+
 # compiled output
 /dist
 /tmp

@@ -1,6 +1,10 @@
-# WorkoutTracker
+# Workout Tracker
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.4.
+
+## Documentation
+
+The documentation for this project can be found [here](https://ionut-t.github.io/workout-tracker-documentation).
 
 ## Development server
 
