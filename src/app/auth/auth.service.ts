@@ -23,7 +23,12 @@ export class AuthService {
     private uiService: UIService
   ) {}
 
-  // It is initialized in the root component
+  /**
+   * It is initialized in the root component.
+   * Check if user exists and has validate his email.
+   * Redirect user.
+   * Cancel all firebase subscriptions if no user.
+   */
   initAuthListener() {
     this.afAuth.authState.subscribe(user => {
       if (user) {
@@ -33,14 +38,20 @@ export class AuthService {
           this.router.navigate(['/workout']);
         }
       } else {
-        this.workoutService.cancelSubscriptions$();
+        this.workoutService.cancelFirebaseSubscriptions$();
         this.authChange$.next(false);
         this.isAuthenticated = false;
       }
     });
   }
 
-  // Register the user based on the auth-data model
+  /**
+   * Indicate the loading process and emit an event after the process is finished.
+   * Register the user based on the auth-data model.
+   * Send verification email upon registration.
+   * Add user to the database.
+   * Display the error messages if any.
+   */
   registerUser(authData: AuthData) {
     this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
@@ -64,7 +75,13 @@ export class AuthService {
     this.authChange$.next(false);
   }
 
-  // Login the user based on the auth-data model and if his email has been verified
+  /**
+   * Indicate the loading process and emit an event after the process is finished.
+   * Check if user's email has been verified.
+   * Login the user based on the auth-data model.
+   * Display warn and succesfull messages.
+   * Redirect user if no errors.
+   */
   loginUser(authData: AuthData) {
     this.uiService.loadingStateChanged$.next(true);
     this.afAuth.auth
@@ -91,28 +108,39 @@ export class AuthService {
       });
   }
 
-  // Logout the user
+  /**
+   * Log out the user.
+   * Redirect to the home page.
+   * Display a succesful message.
+   */
   logoutUser() {
     this.afAuth.auth.signOut();
     this.router.navigate(['']);
     this.uiService.showSnackBar('Logout Successful', null, 3000, 'bottom');
   }
 
-  // Check if the user is authenticated
+  /**
+   * Returns user authentication status.
+   */
   isAuth() {
     return this.isAuthenticated;
   }
 
-  // Create a user collection
+  /**
+   * Add target user to the database.
+   */
   private addUserToDatabase(user: User) {
     this.db.collection('users').add(user);
   }
 
-  // Send verification email
+  /**
+   * Send verification email.
+   * Inform user to validate his email.
+   */
   private async sendVerificationEmail() {
     await this.afAuth.auth.currentUser.sendEmailVerification();
-    this.uiService.showSnackBar(
-      'A verification email has been sent to you address. Validate you email before you login.',
+    await this.uiService.showSnackBar(
+      'A verification email has been sent to you address. Validate your email before continue.',
       null,
       5000,
       'top'
@@ -120,10 +148,12 @@ export class AuthService {
     await this.router.navigate(['/login']);
   }
 
-  // Send email for password reset
+  /**
+   * Send email for password reset.
+   */
   async sendPasswordResetEmail(resetPasswordEmail: string) {
     await this.afAuth.auth.sendPasswordResetEmail(resetPasswordEmail);
-    this.uiService.showSnackBar(
+    await this.uiService.showSnackBar(
       'An email for resseting your password has been sent to your address. Check your inbox.',
       null,
       5000,
@@ -131,7 +161,9 @@ export class AuthService {
     );
   }
 
-  // Handle errors catched by firebase
+  /**
+   * Handle errors catched by firebase.
+   */
   firebaseErrorHandler(error: Error) {
     this.uiService.showSnackBar(error.message, null, 5000, 'top');
   }

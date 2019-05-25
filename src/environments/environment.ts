@@ -12,6 +12,9 @@ import {
   APP_ID
 } from '../../credentials';
 
+/**
+ * Environmental variable
+ */
 export const environment = {
   production: false,
   firebaseConfig: {

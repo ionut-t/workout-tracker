@@ -23,7 +23,15 @@ export class WorkoutService {
     private uiService: UIService
   ) {}
 
-  // Get the list of exercises from the firestore database
+  /**
+   * Indicate the loading process and emit an event after the process is finished.
+   * Get the list of exercises from the firestore database
+   * -> returns an array of exercises based on Exercise model.
+   * Populate the list of exercises.
+   * Store the fetched exercises.
+   * Emit a new copy of the list of exercises.
+   * Handle errors if any.
+   */
   getListOfExercises() {
     this.uiService.loadingStateChanged$.next(true);
     this.firebaseSubscriptions$.push(
@@ -45,9 +53,7 @@ export class WorkoutService {
         .subscribe(
           (exercises: Exercise[]) => {
             this.uiService.loadingStateChanged$.next(false);
-            // Store the fetched exercises
             this.listOfExercises = exercises;
-            // Emit a new copy of the list of exercises
             this.exercisesChanged$.next([...this.listOfExercises]);
           },
           error => {
@@ -64,17 +70,25 @@ export class WorkoutService {
     );
   }
 
+  /**
+   * Returns the selected exercise by the user.
+   * Emit a copy of the selected exercise.
+   * @param selectedId
+   * id of the exercise selected by the user.
+   */
   startWorkout(selectedId: string) {
-    // Find the exercise selected by the user
     this.runningWorkout = this.listOfExercises.find(
       exercise => exercise.id === selectedId
     );
 
-    // Emit a copy of the exercised selected by the user
-    this.selectedExercise$.next({ ...this.runningWorkout });
+    this.selectedExercise$.next({
+      ...this.runningWorkout
+    });
   }
 
-  // Store the results if workout is complete and reset the workout in progress
+  /**
+   * Store the results if workout is complete and reset the workout in progress.
+   */
   completeWorkout() {
     this.addDataToDatabase({
       ...this.runningWorkout,
@@ -85,7 +99,9 @@ export class WorkoutService {
     this.selectedExercise$.next(null);
   }
 
-  // Store the results if workout is cancelled and reset the workout in progress
+  /**
+   * Store the results if workout is cancelled and reset the workout in progress.
+   */
   cancelWorkout(progress: number) {
     this.addDataToDatabase({
       ...this.runningWorkout,
@@ -98,11 +114,18 @@ export class WorkoutService {
     this.selectedExercise$.next(null);
   }
 
+  /**
+   * Returns a copy of the workout in progress.
+   */
   getRunningWorkout() {
     return { ...this.runningWorkout };
   }
 
-  // Fetch completed or cancelled workout from the server
+  /**
+   * Fetch completed or cancelled workout from the server.
+   * Emit a new value whenever the user gets a new finished workout session
+   * from the server.
+   */
   getCompletedOrCancelledWorkout() {
     const userId = this.afAuth.auth.currentUser.uid;
     this.firebaseSubscriptions$.push(
@@ -110,21 +133,23 @@ export class WorkoutService {
         .collection(`users/${userId}/finishedWorkout`)
         .valueChanges()
         .subscribe((exercises: Exercise[]) => {
-          /* Emit a new value whenever the user gets a new finished
-        workout session from the server */
           this.finishedWorkoutChanged$.next(exercises);
         })
     );
   }
 
-  // Cancel all firebase subscriptions
-  cancelSubscriptions$() {
+  /**
+   * Cancel all firebase subscriptions.
+   */
+  cancelFirebaseSubscriptions$() {
     this.firebaseSubscriptions$.forEach(subscription$ =>
       subscription$.unsubscribe()
     );
   }
 
-  // Add completed or cancelled workout to the database
+  /**
+   * Add completed or cancelled workout to the database.
+   */
   private addDataToDatabase(workout: Exercise) {
     const userId = this.afAuth.auth.currentUser.uid;
     this.db.collection(`users/${userId}/finishedWorkout`).add(workout);

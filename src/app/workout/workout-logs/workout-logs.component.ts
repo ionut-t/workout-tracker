@@ -10,6 +10,9 @@ import { Exercise } from '../exercise.model';
 import { WorkoutService } from '../workout.service';
 import { Subscription } from 'rxjs';
 
+/**
+ * Component for displaying results in a data table.
+ */
 @Component({
   selector: 'app-workout-logs',
   templateUrl: './workout-logs.component.html',
@@ -21,13 +24,17 @@ export class WorkoutLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   dataSource = new MatTableDataSource<Exercise>();
   private workoutLogsChangedSubscription$: Subscription;
 
-  // Columns displayed in the table
+  /**
+   * Columns displayed in the table.
+   */
   displayedColumns = ['date', 'name', 'duration', 'calories', 'state'];
 
   constructor(private workoutService: WorkoutService) {}
 
+  /**
+   * Display the workout results in the table logs.
+   */
   ngOnInit() {
-    // Display the workout results in the table logs
     this.workoutLogsChangedSubscription$ = this.workoutService.finishedWorkoutChanged$.subscribe(
       (workoutLogs: Exercise[]) => {
         this.dataSource.data = workoutLogs;
@@ -36,20 +43,26 @@ export class WorkoutLogsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.workoutService.getCompletedOrCancelledWorkout();
   }
 
+  /**
+   * Sort the results stored in the table logs.
+   * Add pagination to the table logs.
+   */
   ngAfterViewInit() {
-    // Sort the results stored in the table logs
     this.dataSource.sort = this.sort;
-    // Add pagination to the table logs
     this.dataSource.paginator = this.paginator;
   }
 
-  // Filter the results stored in the table logs
+  /**
+   * @param filterValue -> filter the results stored in the table logs.
+   */
   onFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  /**
+   * Unsubscribe from workout logs subscription to prevent memory leaks.
+   */
   ngOnDestroy() {
-    // Unsubscribe from subscription to prevent memory leaks
     if (this.workoutLogsChangedSubscription$) {
       this.workoutLogsChangedSubscription$.unsubscribe();
     }

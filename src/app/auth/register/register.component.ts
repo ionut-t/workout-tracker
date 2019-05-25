@@ -5,13 +5,18 @@ import { AuthService } from '../auth.service';
 import { UIService } from '../../shared/ui.service';
 import { Subscription } from 'rxjs';
 
+/**
+ * Component for registering user
+ */
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  // hide/show password
+  /**
+   * Toggle display password
+   */
   hide = true;
 
   registerForm: FormGroup;
@@ -24,6 +29,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private uiService: UIService
   ) {}
 
+  /**
+   * Subscribe to the event emitter.
+   * It will trigger whenever the loading state is changing.
+   * Create and validate the reactive register form.
+   */
   ngOnInit() {
     this.loadingSubscription$ = this.uiService.loadingStateChanged$.subscribe(
       isLoading => (this.isLoading = isLoading)
@@ -40,12 +50,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Getter for easy access to form fields
+  /**
+   *  Getter for easy access to form fields.
+   */
   get f() {
     return this.registerForm.controls;
   }
 
-  // Handle register form errors -> email field
+  /**
+   * Handle register form errors -> email field.
+   */
   emailErrorHandler() {
     if (this.f.email.hasError('required')) {
       return 'You must enter a valid email';
@@ -55,7 +69,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Handle register form errors -> password field
+  /**
+   * Handle register form errors -> password field.
+   */
   passwordErrorHandler() {
     if (this.f.password.hasError('required')) {
       return 'You must enter a password';
@@ -65,7 +81,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Handle register form errors -> confirm-password field
+  /**
+   * Handle register form errors -> confirm-password field.
+   */
   confirmPasswordErrorHandler() {
     if (this.f.confirmPassword.hasError('required')) {
       return 'You must confirm your password';
@@ -75,7 +93,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Register the user
+  /**
+   * Register the user.
+   */
   onSubmit() {
     this.authService.registerUser({
       email: this.registerForm.value.email,
@@ -83,6 +103,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Unsubscribe from the loading subscription to prevent memory leaks.
+   */
   ngOnDestroy() {
     if (this.loadingSubscription$) {
       this.loadingSubscription$.unsubscribe();
