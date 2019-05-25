@@ -15,7 +15,7 @@ export class AuthGuard implements CanLoad {
    * Runs before the bundle is loaded.
    * Check if the user has permissions to access
    * a protected route and before bundle is loaded.
-   * Return true if his authenticated otherwise is redirected to the login page.
+   * Returns true if he's authenticated otherwise is redirected to the login page.
    */
   canLoad(route: Route) {
     if (this.authService.isAuth()) {

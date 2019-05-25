@@ -53,7 +53,8 @@ export class WorkoutLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * @param filterValue -> filter the results stored in the table logs.
+   * @param filterValue
+   * filter the results stored in the table logs.
    */
   onFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
