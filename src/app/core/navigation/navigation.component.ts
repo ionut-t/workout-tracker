@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/auth.service';
+import { MatSidenav } from '@angular/material';
 
 /**
  * Navigation component.
@@ -16,6 +17,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   authSubscription$: Subscription;
   isOpened = false;
   isAuth = false;
+  @ViewChild('drawer') drawer: MatSidenav;
 
   /**
    * Angular Material observable.
@@ -45,6 +47,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
    */
   onLogout() {
     this.authService.logoutUser();
+    this.drawer.close();
   }
 
   /**
